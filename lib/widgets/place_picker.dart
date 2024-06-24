@@ -128,10 +128,12 @@ class PlacePickerState extends State<PlacePicker> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: Platform.isIOS,
       onPopInvoked: (didPop) {
         locationResult = null;
-        _delayedPop();
+        if (Platform.isAndroid) {
+          _delayedPop();
+        }
       },
       child: Scaffold(
         appBar: AppBar(
