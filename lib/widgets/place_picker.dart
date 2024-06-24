@@ -128,7 +128,7 @@ class PlacePickerState extends State<PlacePicker> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: Platform.isAndroid,
+      canPop: false,
       onPopInvoked: (didPop) {
         locationResult = null;
         _delayedPop();
