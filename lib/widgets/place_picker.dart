@@ -19,6 +19,7 @@ import '../uuid.dart';
 ///
 /// API key provided should have `Maps SDK for Android`, `Maps SDK for iOS`
 /// and `Places API`  enabled for it
+// ignore: must_be_immutable
 class PlacePicker extends StatefulWidget {
   /// API key generated from Google Cloud Console. You can get an API key
   /// [here](https://cloud.google.com/maps-platform/)
@@ -90,14 +91,9 @@ class PlacePickerState extends State<PlacePicker> {
     super.initState();
     if (widget.displayLocation == null) {
       _getCurrentLocation().then((value) {
-        if (value != null) {
-          setState(() {
-            _currentLocation = value;
-          });
-        } else {
-          //Navigator.of(context).pop(null);
-          print("getting current location null");
-        }
+        setState(() {
+          _currentLocation = value;
+        });
         setState(() {
           _loadMap = true;
         });
@@ -131,15 +127,11 @@ class PlacePickerState extends State<PlacePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        if (Platform.isAndroid) {
-          locationResult = null;
-          _delayedPop();
-          return Future.value(false);
-        }  else  {
-          return Future.value(true);
-        }
+    return PopScope(
+      canPop: Platform.isAndroid,
+      onPopInvoked: (didPop) {
+        locationResult = null;
+        _delayedPop();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -193,7 +185,8 @@ class PlacePickerState extends State<PlacePicker> {
                     Padding(
                       child: Text(widget.localizationItem!.nearBy,
                           style: TextStyle(fontSize: 16)),
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                     ),
                     Expanded(
                       child: ListView(
@@ -236,10 +229,6 @@ class PlacePickerState extends State<PlacePicker> {
 
     previousSearchTerm = place;
 
-    if (context == null) {
-      return;
-    }
-
     clearOverlay();
 
     setState(() {
@@ -281,7 +270,7 @@ class PlacePickerState extends State<PlacePicker> {
       ),
     );
 
-    Overlay.of(context)?.insert(this.overlayEntry!);
+    Overlay.of(context).insert(this.overlayEntry!);
 
     autoCompleteSearch(place);
   }
@@ -397,7 +386,7 @@ class PlacePickerState extends State<PlacePicker> {
       ),
     );
 
-    Overlay.of(context)?.insert(this.overlayEntry!);
+    Overlay.of(context).insert(this.overlayEntry!);
   }
 
   /// Utility function to get clean readable name of a location. First checks
@@ -514,9 +503,6 @@ class PlacePickerState extends State<PlacePicker> {
             var tmp = result['address_components'][i];
             var types = tmp["types"] as List<dynamic>;
             var shortName = tmp['short_name'];
-            if (types == null) {
-              continue;
-            }
             if (i == 0) {
               // [street_number]
               name = shortName;
@@ -645,7 +631,7 @@ class PlacePickerState extends State<PlacePicker> {
       //moveToLocation(target);
       print('target:$target');
       return target;
-    } on TimeoutException catch (e) {
+    } on TimeoutException catch (_) {
       final locationData = await Geolocator.getLastKnownPosition();
       if (locationData != null) {
         return LatLng(locationData.latitude, locationData.longitude);
@@ -712,8 +698,8 @@ class PlacePickerState extends State<PlacePicker> {
   Future<bool> _delayedPop() async {
     Navigator.of(context, rootNavigator: true).push(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => WillPopScope(
-          onWillPop: () async => false,
+        pageBuilder: (_, __, ___) => PopScope(
+          canPop: false,
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: Center(
