@@ -178,8 +178,7 @@ class PlacePickerState extends State<PlacePicker> {
                   children: <Widget>[
                     SelectPlaceAction(getLocationName(), () {
                       if (Platform.isAndroid) {
-                        // _delayedPop();
-                        Navigator.of(context).pop(this.locationResult);
+                        _delayedPop();
                       } else {
                         Navigator.of(context).pop(this.locationResult);
                       }
@@ -699,28 +698,26 @@ class PlacePickerState extends State<PlacePicker> {
 
   // add delay to the map pop to avoid `Fatal Exception: java.lang.NullPointerException` error on Android
   Future<bool> _delayedPop() async {
-    Navigator.of(context, rootNavigator: true).push(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => PopScope(
-          canPop: false,
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Center(
-              child: CircularProgressIndicator.adaptive(),
-            ),
-          ),
-        ),
-        transitionDuration: Duration.zero,
-        barrierDismissible: false,
-        barrierColor: Colors.black45,
-        opaque: false,
-      ),
-    );
+    // Navigator.of(context, rootNavigator: true).push(
+    //   PageRouteBuilder(
+    //     pageBuilder: (_, __, ___) => PopScope(
+    //       canPop: false,
+    //       child: Scaffold(
+    //         backgroundColor: Colors.transparent,
+    //         body: Center(
+    //           child: CircularProgressIndicator.adaptive(),
+    //         ),
+    //       ),
+    //     ),
+    //     transitionDuration: Duration.zero,
+    //     barrierDismissible: false,
+    //     barrierColor: Colors.black45,
+    //     opaque: false,
+    //   ),
+    // );
 
     await Future.delayed(const Duration(milliseconds: 500));
-    Navigator.of(context)
-      ..pop()
-      ..pop(this.locationResult);
+    Navigator.of(context)..pop(this.locationResult);
     return Future.value(false);
   }
 }
